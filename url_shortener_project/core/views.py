@@ -2,7 +2,10 @@ from django.shortcuts import render
 from .forms import URLForm
 from .url_shortener import url_shortener
 from .models import URL
-from django.http import HttpResponseRedirect 
+from django.http import HttpResponseRedirect
+from django.conf import settings
+
+HOST = settings.ALLOWED_HOSTS[0] + ':8000/'
 
 
 def home(request):
@@ -31,6 +34,6 @@ def home(request):
 
 
 def redirect_to_original(request, path):
-    shortened_url = 'http://localhost:8000/' + path
+    shortened_url = HOST + path
     original_url = URL.objects.get(shortened_url=shortened_url).original_url
     return HttpResponseRedirect(original_url)
