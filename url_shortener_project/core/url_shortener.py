@@ -1,6 +1,9 @@
 import random
 import string
-from django.conf import settings
+
+from django.conf import (
+    settings,
+)
 
 
 def url_shortener(original_url):
