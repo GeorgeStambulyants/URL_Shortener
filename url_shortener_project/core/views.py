@@ -4,6 +4,8 @@ from .url_shortener import url_shortener
 from .models import URL
 from django.http import HttpResponseRedirect
 from django.conf import settings
+from django.shortcuts import redirect
+
 
 HOST = settings.ALLOWED_HOSTS[0] + ':8000/'
 
@@ -15,11 +17,14 @@ def home(request):
         if form.is_valid():
             cd = form.cleaned_data
             original_url = cd['url_to_shorten']
-            shortened_url = url_shortener(original_url)
-            URL.objects.create(
-                original_url=original_url,
-                shortened_url=shortened_url,
-            )
+            try:
+                shortened_url = URL.objects.get(original_url=original_url).shortened_url
+            except URL.DoesNotExist:
+                shortened_url = url_shortener(original_url)
+                URL.objects.create(
+                    original_url=original_url,
+                    shortened_url=shortened_url,
+                )
     else:
         form = URLForm()
     
