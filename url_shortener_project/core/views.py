@@ -1,5 +1,5 @@
 from django.shortcuts import (
-    render, redirect,
+    render, redirect, reverse
 )
 from django.http import(
     HttpResponseRedirect,
@@ -22,7 +22,10 @@ HOST = settings.ALLOWED_HOSTS[0] + ':8000/'
 
 
 def home(request):
-    shortened_url = None
+    shortened_url = request.session.get('current_shortened_url')
+    original_url = request.session.get('current_original_url')
+    if shortened_url:
+        del request.session['current_shortened_url']
     if request.method == 'POST':
         form = URLForm(request.POST)
         if form.is_valid():
@@ -38,8 +41,20 @@ def home(request):
                     original_url=original_url,
                     shortened_url=shortened_url,
                 )
+            request.session['current_shortened_url'] = shortened_url
+            request.session['current_original_url'] = original_url
+            return redirect(
+                reverse(
+                    'core:home',
+                )
+            )
     else:
-        form = URLForm()
+        if original_url:
+            data = {'url_to_shorten': original_url}
+            form = URLForm(data)
+            del request.session['current_original_url']
+        else:
+            form = URLForm()
     
     return render(
         request,
