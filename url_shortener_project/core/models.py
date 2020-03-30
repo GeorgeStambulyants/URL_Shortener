@@ -9,3 +9,11 @@ class URL(models.Model):
 
     def __str__(self):
         return f'{self.original_url} => {self.shortened_url}'
+
+
+class FriendlyURL(models.Model):
+    friendly_shortened_url = models.SlugField(max_length=100, blank=True)
+    original_url = models.ForeignKey(
+        to=URL, on_delete=models.CASCADE, related_name='friendly_url'
+    )
+    is_active = models.BooleanField(default=True)
