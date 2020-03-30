@@ -30,7 +30,7 @@ class HomeView(View):
     template_name = 'core/home.html'
     initial = None
 
-    def get(self, request):
+    def retrieve_current_urls_from_session(self, request):
         self.current_shortened_url = request.session.get(
             'current_shortened_url'
         )
@@ -40,6 +40,7 @@ class HomeView(View):
         self.current_friendly_url = request.session.get(
             'current_friendly_url'
         )
+
         if self.current_friendly_url:
             del request.session['current_friendly_url']
         if self.current_shortened_url:
@@ -50,6 +51,8 @@ class HomeView(View):
             }
             del request.session['current_original_url']
 
+    def get(self, request):
+        self.retrieve_current_urls_from_session(request)
         form = self.form_class(initial=self.initial)
         return render(
             request,
