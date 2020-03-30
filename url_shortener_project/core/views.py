@@ -2,7 +2,7 @@ from django.shortcuts import (
     render, redirect, reverse
 )
 from django.http import(
-    HttpResponseRedirect,
+    HttpResponseRedirect, HttpResponseBadRequest,
 )
 from django.conf import (
     settings,
@@ -98,8 +98,18 @@ class HomeView(View):
 
 def redirect_to_original(request, path):
     shortened_url = HOST + path
-    original_url = URL.objects.get(
-        shortened_url=shortened_url
-    ).original_url
+    try:
+        url = URL.objects.get(
+            shortened_url=shortened_url
+        )
+        original_url = url.original_url
+    except URL.DoesNotExist:
+        try:
+            url = FriendlyURL.objects.get(
+                friendly_shortened_url=shortened_url
+            )
+            original_url = url.original_url.original_url
+        except FriendlyURL.DoesNotExist:
+            return HttpResponseBadRequest('Bad request')
 
     return HttpResponseRedirect(original_url)
