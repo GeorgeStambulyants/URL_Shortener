@@ -15,10 +15,16 @@
     <input type="submit" value="Shorten" class="btn btn-primary">
   </form>    
   {% if shortened_url %}
-    {{ shortened_url }}
+    <p>
+      Shortened URL: 
+      {{ shortened_url }}
+    </p>
   {% endif %}
   {% if friendly_url %}
-    {{ friendly_url }}
+    <p>
+      Friendly URL: 
+      {{ friendly_url }}
+    </p>
   {% endif %}
 </body>
 </html>
