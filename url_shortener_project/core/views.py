@@ -12,7 +12,7 @@ from .forms import (
     URLForm,
 )
 from .url_shortener import (
-    url_shortener,
+    url_shortener, friendly_url_shortener,
 )
 from .models import (
     URL, FriendlyURL
@@ -51,6 +51,13 @@ class HomeView(View):
             }
             del request.session['current_original_url']
 
+    def save_current_urls_in_session(self, request, \
+            original_url, shortened_url, friendly_url):
+
+        request.session['current_shortened_url'] = shortened_url
+        request.session['current_original_url'] = original_url
+        request.session['current_friendly_url'] = friendly_url
+
     def get(self, request):
         self.retrieve_current_urls_from_session(request)
         form = self.form_class(initial=self.initial)
@@ -63,6 +70,29 @@ class HomeView(View):
                 'friendly_url': self.current_friendly_url,
             }
         )
+    
+    def save_new_friendly_url_and_return_it(self, url, word_for_slug):
+        friendly_url = friendly_url_shortener(word_for_slug)
+        friendly_url_object = FriendlyURL.objects.create(
+                friendly_shortened_url=friendly_url,
+                original_url=url
+            )
+        return friendly_url_object.friendly_shortened_url
+
+    def get_friendly_url(self, url, word_for_slug):
+        if word_for_slug:
+            for obj in url.friendly_url.all():
+                if obj.friendly_shortened_url.endswith(word_for_slug):
+                    return obj.friendly_shortened_url
+
+            return self.save_new_friendly_url_and_return_it(url, word_for_slug)
+        try:
+            return url.friendly_url.all()[0].friendly_shortened_url
+        except IndexError:
+            return None
+
+    def get_shortened_url(self, url):
+        return url.shortened_url
 
     def post(self, request):
         form = self.form_class(request.POST)
@@ -71,27 +101,30 @@ class HomeView(View):
             original_url = cd['url_to_shorten']
             word_for_slug = cd['word_for_slug']
             try:
-                shortened_url = URL.objects.get(
+                url = URL.objects.get(
                     original_url=original_url
-                ).shortened_url
-                friendly_shortened_url = URL.friendly_url.get(
-                    original_url=original_url
-                ).friendly_shortened_url
+                )
+                shortened_url = self.get_shortened_url(url)
+                friendly_url = self.get_friendly_url(url, word_for_slug)
             except URL.DoesNotExist:
-                shortened_url, friendly_shortened_url = ( 
-                    url_shortener(original_url, word_for_slug))
+                shortened_url = url_shortener()
                 url = URL.objects.create(
-                    original_url=original_url,
-                    shortened_url=shortened_url,
-                )
-                FriendlyURL.objects.create(
-                    friendly_shortened_url=friendly_shortened_url,
-                    original_url=url,
-                )
-            request.session['current_shortened_url'] = shortened_url
-            request.session['current_original_url'] = original_url
-            request.session['current_friendly_url'] = friendly_shortened_url
+                        original_url=original_url,
+                        shortened_url=shortened_url,
+                    )
+                if word_for_slug:
+                    friendly_url = friendly_url_shortener(word_for_slug)
+                    FriendlyURL.objects.create(
+                        friendly_shortened_url=friendly_url,
+                        original_url=url,
+                    )
+                else:
+                    friendly_url = None
             
+            self.save_current_urls_in_session(
+                request, original_url, shortened_url, friendly_url,
+            )
+
             return redirect(reverse('core:home'))
     
         return render(

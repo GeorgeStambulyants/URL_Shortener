@@ -7,11 +7,7 @@ from django.conf import (
 from .models import URL
 
 
-def url_shortener(original_url, slug_word=None):
-    if slug_word:
-        friendly_shortened_url = settings.ALLOWED_HOSTS[0] + ':8000/' + slug_word
-    else:
-        friendly_shortened_url = ''
+def url_shortener():
     shortened_url = settings.ALLOWED_HOSTS[0] + ':8000/'
     for _ in range(6):
         shortened_url += random.choice(
@@ -27,4 +23,12 @@ def url_shortener(original_url, slug_word=None):
                 )
             )
         except URL.DoesNotExist:
-            return shortened_url, friendly_shortened_url
+            return shortened_url
+
+
+def friendly_url_shortener(word_for_slug):
+    friendly_shortened_url = (
+        settings.ALLOWED_HOSTS[0] + ':8000/' + word_for_slug
+    )
+
+    return friendly_shortened_url
