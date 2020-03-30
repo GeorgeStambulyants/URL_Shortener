@@ -12,7 +12,7 @@ class URL(models.Model):
 
 
 class FriendlyURL(models.Model):
-    friendly_shortened_url = models.SlugField(max_length=100, blank=True)
+    friendly_shortened_url = models.SlugField(max_length=100, blank=True, unique=True)
     original_url = models.ForeignKey(
         to=URL, on_delete=models.CASCADE, related_name='friendly_url'
     )
