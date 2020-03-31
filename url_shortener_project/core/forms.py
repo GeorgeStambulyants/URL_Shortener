@@ -19,9 +19,12 @@ class URLForm(forms.Form):
         if word_for_slug:    
             try:
                 url_obj = URL.objects.get(original_url=original_url)
-                friendly_url_objs = FriendlyURL.objects.exclude(original_url=url_obj.pk)
-                self.check_unique_slug(word_for_slug, friendly_url_objs) 
+                friendly_url_objs = FriendlyURL.objects.exclude(
+                    original_url=url_obj.pk
+                )
+                self.check_unique_slug(word_for_slug, friendly_url_objs)
             except URL.DoesNotExist:
                 friendly_url_objs = FriendlyURL.objects.all()
                 self.check_unique_slug(word_for_slug, friendly_url_objs)
+
         return word_for_slug

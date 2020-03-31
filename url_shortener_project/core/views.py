@@ -7,7 +7,9 @@ from django.http import(
 from django.conf import (
     settings,
 )
-from django.views import View
+from django.views import (
+    View,
+)
 from .forms import (
     URLForm,
 )
