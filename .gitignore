@@ -1,5 +1,10 @@
-.vscode
-venv
-__pycache__
+# IDEs and text editors
+.idea/
+.vscode/
+
+# python stuff
+__pycache__/
+
+# database for development
 db.sqlite3
 
