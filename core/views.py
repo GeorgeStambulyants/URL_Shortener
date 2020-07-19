@@ -1,24 +1,11 @@
-from django.shortcuts import (
-    render, redirect, reverse
-)
-from django.http import(
-    HttpResponseRedirect, HttpResponseBadRequest,
-)
-from django.conf import (
-    settings,
-)
-from django.views import (
-    View,
-)
-from .forms import (
-    URLForm,
-)
-from .url_shortener import (
-    url_shortener, friendly_url_shortener,
-)
-from .models import (
-    URL, FriendlyURL
-)
+from django.shortcuts import render, redirect, reverse
+from django.http import HttpResponseRedirect, HttpResponseBadRequest
+from django.conf import settings
+from django.views import View
+
+from .forms import URLForm
+from .url_shortener import url_shortener, friendly_url_shortener
+from .models import URL, FriendlyURL
 
 
 HOST = settings.ALLOWED_HOSTS[0] + ':8000/'

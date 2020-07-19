@@ -1,12 +1,9 @@
 import random
 import string
 
-from django.conf import (
-    settings,
-)
-from .models import (
-    URL,
-)
+from django.conf import settings
+
+from .models import URL
 
 
 def url_shortener():
